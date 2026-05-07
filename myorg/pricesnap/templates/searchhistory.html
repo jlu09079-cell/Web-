@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="flex flex-col gap-4 rounded-3xl bg-white p-8 shadow-sm sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Search history</h1>
+        <p class="mt-2 text-slate-600">Searches are now recorded from the backend and read from `SearchHistory`.</p>
+    </div>
+    <div class="rounded-2xl bg-slate-900 px-5 py-4 text-white"><p class="text-sm text-slate-300">Total recorded</p><p class="mt-1 text-3xl font-bold">{{ search_count }}</p></div>
+</section>
+<section class="mt-8 space-y-4">
+    {% for item in history_items %}
+    <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-bold">{{ item.query }}</h2>
+                <p class="mt-1 text-sm text-slate-500">{{ item.timestamp|date:'M d, Y H:i' }} ? {{ item.category|default:'General search' }}</p>
+                {% if item.clicked_product %}<p class="mt-2 text-sm text-blue-600">Clicked product: {{ item.clicked_product.title }}</p>{% endif %}
+            </div>
+            <div class="rounded-2xl bg-slate-50 px-5 py-4 text-sm"><p class="text-slate-500">Results returned</p><p class="mt-1 text-2xl font-bold text-slate-900">{{ item.result_count|default:0 }}</p></div>
+        </div>
+    </article>
+    {% empty %}
+    <p class="text-slate-500">No searches recorded yet.</p>
+    {% endfor %}
+</section>
+{% endblock %}

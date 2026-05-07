@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="rounded-3xl bg-white p-8 shadow-sm">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600">Comparison view</p>
+            <h1 class="mt-2 text-3xl font-extrabold tracking-tight">{{ product.title }}</h1>
+            <p class="mt-2 text-slate-600">The comparison page now reads directly from `ProductPrice` records and computes totals in the model.</p>
+        </div>
+        {% if best_offer %}
+        <div class="rounded-2xl bg-slate-900 px-5 py-4 text-white">
+            <p class="text-sm text-slate-300">Cheapest offer</p>
+            <p class="mt-1 text-2xl font-bold">${{ best_offer.total_price }} on {{ best_offer.platform.name }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500">
+            <tr><th class="px-6 py-4">Platform</th><th class="px-6 py-4">Base price</th><th class="px-6 py-4">Shipping</th><th class="px-6 py-4">Total</th><th class="px-6 py-4">Discount</th><th class="px-6 py-4">Link</th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for offer in offers %}
+            <tr>
+                <td class="px-6 py-4 font-semibold text-slate-900">{{ offer.platform.name }}</td>
+                <td class="px-6 py-4">${{ offer.price }}</td>
+                <td class="px-6 py-4">${{ offer.shipping_cost }}</td>
+                <td class="px-6 py-4 font-bold {% if best_offer and offer.price_id == best_offer.price_id %}text-blue-700{% endif %}">${{ offer.total_price }}</td>
+                <td class="px-6 py-4">{% if offer.discount_percentage %}{{ offer.discount_percentage }}%{% else %}N/A{% endif %}</td>
+                <td class="px-6 py-4">{% if offer.product_url %}<a href="{{ offer.product_url }}" class="font-semibold text-blue-600">Open</a>{% else %}<span class="text-slate-400">Unavailable</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-6 py-6 text-slate-500">No price rows found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

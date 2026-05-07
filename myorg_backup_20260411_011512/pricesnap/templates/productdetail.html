@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
+    <div class="overflow-hidden rounded-3xl bg-white shadow-sm">
+        <img src="{{ product.image_url|default:'https://via.placeholder.com/900x600?text=Price+Snap' }}" alt="{{ product.title }}" class="h-full w-full object-cover">
+    </div>
+    <div class="space-y-6 rounded-3xl bg-white p-8 shadow-sm">
+        <div>
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600">{{ product.category|default:'General' }}</p>
+            <h1 class="mt-2 text-4xl font-extrabold tracking-tight">{{ product.title }}</h1>
+            <p class="mt-4 text-slate-600">{{ product.description|default:'This product now renders from the Django backend with live offer data.' }}</p>
+        </div>
+        <div class="grid gap-4 rounded-2xl bg-slate-50 p-5 sm:grid-cols-2">
+            <div><p class="text-sm text-slate-500">Brand</p><p class="text-lg font-semibold text-slate-900">{{ product.brand|default:'Unknown' }}</p></div>
+            <div><p class="text-sm text-slate-500">Rating</p><p class="text-lg font-semibold text-slate-900">{{ product.rating|default:'N/A' }}</p></div>
+            <div><p class="text-sm text-slate-500">Reviews</p><p class="text-lg font-semibold text-slate-900">{{ product.review_count }}</p></div>
+            <div><p class="text-sm text-slate-500">Average total</p><p class="text-lg font-semibold text-slate-900">{% if average_price %}${{ average_price|floatformat:2 }}{% else %}N/A{% endif %}</p></div>
+        </div>
+        {% if best_offer %}
+        <div class="rounded-2xl bg-blue-600 p-5 text-white">
+            <p class="text-sm uppercase tracking-[0.3em] text-blue-100">Best current deal</p>
+            <p class="mt-2 text-3xl font-extrabold">${{ best_offer.price }}</p>
+            <p class="mt-1 text-blue-100">{{ best_offer.platform.name }} ? Shipping ${{ best_offer.shipping_cost }} ? {{ best_offer.delivery_time|default:'Delivery info pending' }}</p>
+            <div class="mt-4 flex gap-3">
+                <a href="{% url 'product_compare' product.product_id %}" class="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-blue-700">Compare all offers</a>
+                <a href="{% url 'alerts' %}" class="rounded-xl border border-white/30 px-4 py-2 text-sm font-semibold">Create alert</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="mt-10 rounded-3xl bg-white p-8 shadow-sm">
+    <div class="mb-5 flex items-center justify-between">
+        <h2 class="text-2xl font-bold">Live price comparison</h2>
+        <a href="{% url 'product_compare' product.product_id %}" class="text-sm font-semibold text-blue-600">Open comparison view</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead><tr class="text-left text-slate-500"><th class="py-3 pr-4">Platform</th><th class="py-3 pr-4">Product price</th><th class="py-3 pr-4">Shipping</th><th class="py-3 pr-4">Total</th><th class="py-3">Availability</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for offer in offers %}
+                <tr>
+                    <td class="py-4 pr-4 font-semibold text-slate-900">{{ offer.platform.name }}</td>
+                    <td class="py-4 pr-4">${{ offer.price }}</td>
+                    <td class="py-4 pr-4">${{ offer.shipping_cost }}</td>
+                    <td class="py-4 pr-4 font-semibold text-blue-700">${{ offer.total_price }}</td>
+                    <td class="py-4">{{ offer.availability_status|yesno:'In stock,Unavailable' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-6 text-slate-500">No offers available yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="grid gap-8 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
+    <div>
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-blue-600">The precision curator</p>
+        <h1 class="max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">Search live offers across platforms and keep the frontend synced with real product data.</h1>
+        <p class="mt-4 max-w-2xl text-lg text-slate-600">Your homepage is now backed by Django views, routed URLs, and database-driven product cards instead of hardcoded file links.</p>
+        <form action="{% url 'product_list' %}" method="get" class="mt-8 flex flex-col gap-3 sm:flex-row">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Search products, brands, or categories" class="flex-1 rounded-xl border border-slate-300 px-4 py-3 shadow-sm focus:border-blue-500 focus:outline-none">
+            <button type="submit" class="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white">Search products</button>
+        </form>
+    </div>
+    <div class="rounded-3xl bg-slate-900 p-6 text-white shadow-2xl shadow-slate-200">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-200">Demo profile</p>
+        <h2 class="mt-3 text-2xl font-bold">{{ demo_user.name }}</h2>
+        <p class="mt-2 text-slate-300">{{ demo_user.email }} ? {{ demo_user.subscription_type }} member</p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Products</p><p class="mt-2 text-3xl font-bold">{{ product_count }}</p></div>
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Platforms</p><p class="mt-2 text-3xl font-bold">{{ platform_count }}</p></div>
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Alerts</p><p class="mt-2 text-3xl font-bold">{{ alert_count }}</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-12">
+    <div class="mb-5 flex items-center justify-between">
+        <h2 class="text-2xl font-bold">Featured products</h2>
+        <a href="{% url 'product_list' %}" class="text-sm font-semibold text-blue-600">View all</a>
+    </div>
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {% for product in featured_products %}
+        <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+            <img src="{{ product.image_url|default:'https://via.placeholder.com/600x400?text=Price+Snap' }}" alt="{{ product.title }}" class="h-52 w-full object-cover">
+            <div class="p-6">
+                <p class="text-sm font-semibold text-blue-600">{{ product.category|default:'General' }}</p>
+                <h3 class="mt-2 text-xl font-bold text-slate-900">{{ product.title }}</h3>
+                <p class="mt-2 text-sm text-slate-600">{{ product.description|default:'Price tracking enabled for this product.'|truncatechars:120 }}</p>
+                <div class="mt-4 flex items-end justify-between">
+                    <div>
+                        {% if product.best_offer_cached %}
+                        <p class="text-sm text-slate-500">Best offer on {{ product.best_offer_cached.platform.name }}</p>
+                        <p class="text-2xl font-extrabold text-slate-900">${{ product.best_offer_cached.price }}</p>
+                        {% else %}
+                        <p class="text-sm text-slate-500">No offers yet</p>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'product_detail' product.product_id %}" class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Details</a>
+                </div>
+            </div>
+        </article>
+        {% empty %}
+        <p class="text-slate-500">No products matched your search yet.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

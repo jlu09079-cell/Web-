@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="rounded-3xl bg-white p-8 shadow-sm">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-3xl font-extrabold tracking-tight">Price alerts</h1>
+            <p class="mt-2 text-slate-600">Alerts now support target platforms, frequency, and trigger checks against current offers.</p>
+        </div>
+        <a href="{% url 'product_list' %}" class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white">Track another product</a>
+    </div>
+</section>
+<section class="mt-8 space-y-4">
+    {% for alert in alerts %}
+    <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <div class="flex flex-wrap items-center gap-2"><h2 class="text-2xl font-bold">{{ alert.product.title }}</h2><span class="rounded-full px-3 py-1 text-xs font-semibold {% if alert.is_reached %}bg-emerald-100 text-emerald-700{% else %}bg-amber-100 text-amber-700{% endif %}">{% if alert.is_reached %}Target reached{% else %}Watching{% endif %}</span></div>
+                <p class="mt-2 text-sm text-slate-600">Platform: {{ alert.target_platform.name|default:'Any platform' }} · Frequency: {{ alert.get_notification_frequency_display }}</p>
+                {% if alert.notes %}<p class="mt-2 text-sm text-slate-500">{{ alert.notes }}</p>{% endif %}
+            </div>
+            <div class="grid gap-3 rounded-2xl bg-slate-50 p-4 text-sm sm:grid-cols-3">
+                <div><p class="text-slate-500">Target price</p><p class="text-lg font-bold text-slate-900">Rs. {{ alert.target_price }}</p></div>
+                <div><p class="text-slate-500">Current best</p><p class="text-lg font-bold text-blue-700">{% if alert.current_offer %}Rs. {{ alert.current_offer.price }}{% else %}N/A{% endif %}</p></div>
+                <div><p class="text-slate-500">Status</p><p class="text-lg font-bold text-slate-900">{{ alert.alert_status|yesno:'Active,Paused' }}</p></div>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <p class="text-slate-500">No alerts configured yet.</p>
+    {% endfor %}
+</section>
+{% endblock %}

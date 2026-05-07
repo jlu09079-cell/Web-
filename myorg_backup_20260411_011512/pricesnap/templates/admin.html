@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="flex flex-col gap-4 rounded-3xl bg-white p-8 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight">System settings and ops view</h1>
+        <p class="mt-2 text-slate-600">This page now reflects database totals and real API logs from your app models.</p>
+    </div>
+    <a href="{% url 'dashboard' %}" class="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700">Back to dashboard</a>
+</section>
+<section class="mt-8 grid gap-6 md:grid-cols-4">
+    <article class="rounded-3xl bg-white p-6 shadow-sm"><p class="text-sm text-slate-500">Monthly Revenue</p><p class="mt-2 text-3xl font-bold">{{ summary.monthly_revenue }}</p></article>
+    <article class="rounded-3xl bg-white p-6 shadow-sm"><p class="text-sm text-slate-500">Active Users</p><p class="mt-2 text-3xl font-bold">{{ summary.active_users }}</p></article>
+    <article class="rounded-3xl bg-white p-6 shadow-sm"><p class="text-sm text-slate-500">Searches</p><p class="mt-2 text-3xl font-bold">{{ summary.searches }}</p></article>
+    <article class="rounded-3xl bg-white p-6 shadow-sm"><p class="text-sm text-slate-500">Avg API Response</p><p class="mt-2 text-3xl font-bold">{{ summary.avg_response }} ms</p></article>
+</section>
+<section class="mt-8 overflow-hidden rounded-3xl bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-6 py-5"><h2 class="text-2xl font-bold">Recent API logs</h2></div>
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500"><tr><th class="px-6 py-4">Platform</th><th class="px-6 py-4">Status</th><th class="px-6 py-4">Response time</th><th class="px-6 py-4">Requests</th><th class="px-6 py-4">Timestamp</th></tr></thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for log in api_logs %}
+            <tr><td class="px-6 py-4 font-semibold text-slate-900">{{ log.platform.name }}</td><td class="px-6 py-4">{{ log.request_status }}</td><td class="px-6 py-4">{{ log.response_time }} ms</td><td class="px-6 py-4">{{ log.request_count|default:0 }}</td><td class="px-6 py-4">{{ log.timestamp|date:'M d, Y H:i' }}</td></tr>
+            {% empty %}
+            <tr><td colspan="5" class="px-6 py-6 text-slate-500">No API logs available.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

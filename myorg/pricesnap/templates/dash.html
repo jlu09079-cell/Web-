@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+    <div class="rounded-3xl bg-slate-900 p-8 text-white shadow-xl">
+        <p class="text-sm uppercase tracking-[0.3em] text-blue-200">Dashboard</p>
+        <h1 class="mt-3 text-4xl font-extrabold tracking-tight">Today's snapshot</h1>
+        <p class="mt-3 max-w-2xl text-slate-300">The dashboard is now driven by product, search, alert, and pricing data from your models instead of static cards.</p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-4">
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Tracked items</p><p class="mt-2 text-3xl font-bold">{{ tracked_items }}</p></div>
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Alerts</p><p class="mt-2 text-3xl font-bold">{{ alert_count }}</p></div>
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Best live price</p><p class="mt-2 text-3xl font-bold">Rs. {{ best_price }}</p></div>
+            <div class="rounded-2xl bg-white/10 p-4"><p class="text-sm text-slate-300">Top discount</p><p class="mt-2 text-3xl font-bold">{{ highest_discount|default:0 }}%</p></div>
+        </div>
+    </div>
+    <div class="rounded-3xl bg-white p-8 shadow-sm">
+        <h2 class="text-2xl font-bold">Total modeled savings</h2>
+        <p class="mt-3 text-4xl font-extrabold text-blue-700">Rs. {{ total_savings|floatformat:2 }}</p>
+        <p class="mt-3 text-slate-600">This total comes from `original_price - price` across the offers currently stored in the database.</p>
+    </div>
+</section>
+
+<section class="mt-10 grid gap-8 lg:grid-cols-2">
+    <div class="rounded-3xl bg-white p-8 shadow-sm">
+        <div class="mb-5 flex items-center justify-between"><h2 class="text-2xl font-bold">Recent searches</h2><a href="{% url 'history' %}" class="text-sm font-semibold text-blue-600">Full history</a></div>
+        <div class="space-y-4">
+            {% for item in recent_searches %}
+            <article class="rounded-2xl border border-slate-200 p-4">
+                <p class="text-lg font-semibold text-slate-900">{{ item.query }}</p>
+                <p class="mt-1 text-sm text-slate-500">{{ item.timestamp|date:'M d, Y H:i' }} ? {{ item.result_count|default:0 }} results</p>
+                {% if item.clicked_product %}<p class="mt-2 text-sm text-blue-600">Clicked: {{ item.clicked_product.title }}</p>{% endif %}
+            </article>
+            {% empty %}
+            <p class="text-slate-500">No recent searches recorded.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="rounded-3xl bg-white p-8 shadow-sm">
+        <div class="mb-5 flex items-center justify-between"><h2 class="text-2xl font-bold">Watchlist highlights</h2><a href="{% url 'favorites' %}" class="text-sm font-semibold text-blue-600">View favorites</a></div>
+        <div class="space-y-4">
+            {% for product in favorite_products %}
+            <article class="rounded-2xl border border-slate-200 p-4">
+                <p class="text-lg font-semibold text-slate-900">{{ product.title }}</p>
+                <p class="mt-1 text-sm text-slate-500">{{ product.category|default:'General' }}</p>
+                <p class="mt-2 text-sm text-blue-600">{% if product.best_offer_cached %}Best offer: Rs. {{ product.best_offer_cached.price }} on {{ product.best_offer_cached.platform.name }}{% else %}No offers yet{% endif %}</p>
+            </article>
+            {% empty %}
+            <p class="text-slate-500">No favorites added yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

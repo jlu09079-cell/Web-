@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="flex items-end justify-between gap-4 rounded-3xl bg-white p-8 shadow-sm">
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Favorites</h1>
+        <p class="mt-2 text-slate-600">Each favorite is linked to a product row and its live best offer.</p>
+    </div>
+    <a href="{% url 'product_list' %}" class="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white">Browse products</a>
+</section>
+<section class="mt-8 grid gap-6 md:grid-cols-2">
+    {% for favorite in favorites %}
+    <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <img src="{{ favorite.product.image_url|default:'https://via.placeholder.com/800x400?text=Price+Snap' }}" alt="{{ favorite.product.title }}" class="h-56 w-full object-cover">
+        <div class="p-6">
+            <p class="text-sm font-semibold text-blue-600">{{ favorite.product.brand|default:'Price Snap' }}</p>
+            <h2 class="mt-1 text-2xl font-bold">{{ favorite.product.title }}</h2>
+            <p class="mt-2 text-sm text-slate-600">Added {{ favorite.added_date|date:'M d, Y' }}</p>
+            {% if favorite.best_offer %}
+            <div class="mt-4 rounded-2xl bg-slate-50 p-4 text-sm"><p class="font-semibold text-slate-900">Current best offer</p><p class="mt-1 text-blue-700">${{ favorite.best_offer.price }} on {{ favorite.best_offer.platform.name }}</p></div>
+            {% endif %}
+            <div class="mt-5 flex gap-3">
+                <a href="{% url 'product_detail' favorite.product.product_id %}" class="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white">Product</a>
+                <a href="{% url 'product_compare' favorite.product.product_id %}" class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700">Compare</a>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <p class="text-slate-500">No favorites are saved yet.</p>
+    {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="flex flex-col gap-5 rounded-3xl bg-white p-6 shadow-sm lg:flex-row lg:items-end lg:justify-between">
+    <div>
+        <h1 class="text-3xl font-extrabold tracking-tight">Product catalog</h1>
+        <p class="mt-2 text-slate-600">Every card below is connected to your `Product` and `ProductPrice` tables.</p>
+    </div>
+    <form method="get" class="grid gap-3 sm:grid-cols-[1fr,220px,auto]">
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by title or brand" class="rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none">
+        <select name="category" class="rounded-xl border border-slate-300 px-4 py-3 focus:border-blue-500 focus:outline-none">
+            <option value="">All categories</option>
+            {% for category in categories %}
+            <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white">Filter</button>
+    </form>
+        </section>
+
+        {% if marketplace_ready %}
+        <section class="mt-6 rounded-3xl bg-slate-900 p-6 text-white shadow-sm">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-xl font-bold">Live marketplace results</h2>
+                    <p class="mt-1 text-sm text-slate-300">Amazon and Flipkart offers were synced into your catalog for this search.</p>
+                </div>
+                <div class="rounded-2xl bg-white/10 px-4 py-3 text-sm">
+                    Synced offers: <span class="font-bold">{{ synced_count }}</span>
+                </div>
+            </div>
+        </section>
+        {% elif show_marketplace_setup_notice %}
+        <section class="mt-6 rounded-3xl border border-blue-200 bg-blue-50 p-6 text-blue-950 shadow-sm">
+            <h2 class="text-xl font-bold">Connect marketplace APIs</h2>
+            <p class="mt-2 text-sm text-blue-900">Live products are available after you add your Amazon and Flipkart API credentials to the project `.env` file and restart the server.</p>
+            <p class="mt-3 text-sm text-blue-800">Right now the app is searching your database only, so no new marketplace products were imported for this query.</p>
+        </section>
+        {% endif %}
+
+        <section class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {% for product in products %}
+    <article class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <img src="{{ product.image_url|default:'https://via.placeholder.com/600x400?text=Price+Snap' }}" alt="{{ product.title }}" class="h-56 w-full object-cover">
+        <div class="p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-blue-600">{{ product.brand|default:'Price Snap' }}</p>
+                    <h2 class="mt-1 text-xl font-bold">{{ product.title }}</h2>
+                </div>
+                {% if product.rating %}
+                <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">{{ product.rating }}/5</span>
+                {% endif %}
+            </div>
+            <p class="mt-3 text-sm text-slate-600">{{ product.description|default:'This product is ready for comparison and alert tracking.'|truncatechars:115 }}</p>
+            <div class="mt-5 grid gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                <p><span class="font-semibold text-slate-900">Category:</span> {{ product.category|default:'Uncategorized' }}</p>
+                <p><span class="font-semibold text-slate-900">Offers:</span> {{ product.offer_count }}</p>
+                <p><span class="font-semibold text-slate-900">Best price:</span> {% if product.best_offer_cached %}${{ product.best_offer_cached.price }} on {{ product.best_offer_cached.platform.name }}{% else %}Not available{% endif %}</p>
+            </div>
+            <div class="mt-5 flex gap-3">
+                <a href="{% url 'product_detail' product.product_id %}" class="flex-1 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white">View details</a>
+                <a href="{% url 'product_compare' product.product_id %}" class="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-slate-700">Compare</a>
+            </div>
+        </div>
+    </article>
+    {% empty %}
+    <p class="text-slate-500">No products found for this filter.</p>
+    {% endfor %}
+</section>
+{% endblock %}
