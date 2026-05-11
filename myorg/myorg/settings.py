@@ -96,4 +96,10 @@ MARKETPLACE_INTEGRATIONS = {
         'hl': os.getenv('SERPAPI_HL', 'en'),
         'amazon_domain': os.getenv('SERPAPI_AMAZON_DOMAIN', 'amazon.in'),
     },
+    
 }
+
+ALLOWED_HOSTS = ["*"]
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
